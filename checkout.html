@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    header {
+      background: #222;
+      color: white;
+      padding: 1rem;
+      text-align: left;
+    }
+
+    .cart-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+
+    .cart-table th, .cart-table td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    .cart-table button {
+      padding: 6px 10px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .cart-table button:hover {
+      background: #b02a37;
+    }
+
+    .total {
+      font-weight: bold;
+      text-align: right;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    form input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    form button {
+      background: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background: #0056b3;
+    }
+
+    .checkout {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: 2rem auto;
+      max-width: 700px;
+    }
+
+    @media (max-width: 600px) {
+      .checkout {
+        padding: 1rem;
+      }
+
+      .cart-table th, .cart-table td {
+        font-size: 0.9rem;
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Checkout</h1>
+  </header>
+
+  <div class="container checkout">
+    <h2>Your Cart</h2>
+    <table class="cart-table" id="cartTable">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Price (₹)</th>
+          <th>Quantity</th>
+          <th>Subtotal (₹)</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p class="total" id="totalPrice">Total: ₹0.00</p>
+
+    <h2>Billing Information</h2>
+    <form onsubmit="placeOrder(event)">
+      <input type="text" placeholder="Full Name" required />
+      <input type="text" placeholder="Address" required />
+      <input type="text" placeholder="City" required />
+      <input type="text" placeholder="Postal Code" id="postalCode" maxlength="6" inputmode="numeric" required />
+      <input type="text" placeholder="Credit/Debit Card Number" id="cardNumber" maxlength="19" inputmode="numeric" required />
+      <div style="text-align: center; margin-top: 1rem;">
+  <button type="submit">Place Order</button>
+</div>
+
+    </form>
+  </div>
+
+  <script>
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const tbody = document.querySelector('#cartTable tbody');
+    const totalEl = document.getElementById('totalPrice');
+
+    function renderCart() {
+      tbody.innerHTML = '';
+      let total = 0;
+
+      if (cart.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Your cart is empty.</td></tr>';
+        totalEl.innerText = `Total: ₹0.00`;
+        return;
+      }
+
+      cart.forEach((item, index) => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>₹${item.price.toFixed(2)}</td>
+          <td>${item.quantity}</td>
+          <td>₹${subtotal.toFixed(2)}</td>
+          <td><button onclick="deleteItem(${index})">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      totalEl.innerText = `Total: ₹${total.toFixed(2)}`;
+    }
+
+    function deleteItem(index) {
+  if (cart[index].quantity > 1) {
+    cart[index].quantity -= 1;
+  } else {
+    cart.splice(index, 1);
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  renderCart();
+}
+
+
+    function placeOrder(event) {
+      event.preventDefault();
+
+      const postalCode = document.getElementById('postalCode').value.trim();
+      const cardInput = document.getElementById('cardNumber').value.trim();
+      const cardNumber = cardInput.replace(/\s/g, '');
+
+      const isPostalValid = /^\d{6}$/.test(postalCode);
+      const isCardValid = /^\d{16}$/.test(cardNumber);
+
+      if (!isPostalValid) {
+        alert('Postal code must be a 6-digit number.');
+        return;
+      }
+
+      if (!isCardValid) {
+        alert('Credit/Debit card number must be a 16-digit number.');
+        return;
+      }
+
+      alert('Order placed successfully!');
+      localStorage.removeItem('cart');
+      window.location.href = 'index.html';
+    }
+
+    // Format credit card input
+    const cardInput = document.getElementById('cardNumber');
+    cardInput.addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '').slice(0, 16);
+      let formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+      e.target.value = formatted;
+    });
+
+    renderCart();
+  </script>
+</body>
+</html>

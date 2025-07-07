@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cartify - Products</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      background-color: #222;
+      color: white;
+      flex-wrap: nowrap;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      margin: 0.5rem 0;
+    }
+
+    .top-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-left: auto;
+      flex-wrap: nowrap;
+    }
+
+    .top-buttons button {
+      background: #007bff;
+      color: white;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .top-buttons button:hover {
+      background: #0056b3;
+    }
+
+    .container.products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      max-height: 250px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    .card button {
+      background: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .card button:hover {
+      background: #0056b3;
+    }
+
+    .checkout-center {
+      text-align: center;
+      margin: 2rem auto;
+    }
+
+    .checkout-center button {
+      background: #007bff;
+      color: white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .checkout-center button:hover {
+      background: #0056b3;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-wrap: wrap;
+        flex-direction: row;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+        flex: 1 1 60%;
+      }
+
+      .top-buttons {
+        justify-content: flex-end;
+        flex: 1 1 40%;
+      }
+
+      .card h3 {
+        font-size: 0.95rem;
+      }
+
+      .card p {
+        font-size: 0.9rem;
+      }
+
+      .card button {
+        font-size: 0.9rem;
+      }
+
+      .checkout-center button {
+        font-size: 0.95rem;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cartify Products</h1>
+    <div class="top-buttons">
+      <button onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="container products">
+    <div class="card">
+      <img src="assets/images/product1.jpg" alt="Product 1" />
+      <h3>Wildcraft New Polyester 28 Liters Laptop Casual 4 Compartment Backpack (Black)</h3>
+      <p>₹1,349</p>
+      <button onclick="addToCart('Wildcraft New Polyester 28 Liters Laptop Casual 4 Compartment Backpack (Black)', 1349)">Add to Cart</button>
+    </div>
+    <div class="card">
+      <img src="assets/images/product2.jpg" alt="Product 2" />
+      <h3>ZOUK Office Bag Stylish Bags for Office Use Laptop Bag 15.6 inch</h3>
+      <p>₹1,499</p>
+      <button onclick="addToCart('ZOUK Office Bag Stylish Bags for Office Use Laptop Bag 15.6 inch', 1499)">Add to Cart</button>
+    </div>
+  </div>
+
+  <div class="checkout-center">
+    <button onclick="window.location.href='checkout.html'">Go to Checkout</button>
+  </div>
+
+  <script>
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      window.location.href = 'login.html';
+    }
+
+    function addToCart(name, price) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const existing = cart.find(item => item.name === name);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert(`${name} added to cart`);
+    }
+  </script>
+</body>
+</html>
